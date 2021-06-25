@@ -15,10 +15,10 @@ contract GameDevCredits is
 {
     using Counters for Counters.Counter;
 
-    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
+    bytes32 public constant MINTER_ROLE = keccak256("GAME_DEV");
     Counters.Counter private _tokenIdCounter;
 
-    constructor() ERC721("GameDev", "Game-Dev") {
+    constructor() ERC721("Checkpoints", "CHECKPOINTS") {
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _setupRole(MINTER_ROLE, msg.sender);
     }
