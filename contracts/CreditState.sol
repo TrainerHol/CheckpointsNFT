@@ -2,10 +2,14 @@
 pragma solidity ^0.8.4;
 
 contract CreditState {
-    enum FlowState {OPEN, ACCEPTED, DENIED}
+    enum FlowState {
+        OPEN,
+        ACCEPTED,
+        DENIED
+    }
     struct Credit {
-        mapping (uint => CreditStringProperty) stringProperties;
-        mapping (uint => CreditNumberProperty) numberProperties;
+        mapping(uint256 => CreditStringProperty) stringProperties;
+        mapping(uint256 => CreditNumberProperty) numberProperties;
     }
     struct CreditProposal {
         FlowState flowState;
@@ -18,8 +22,7 @@ contract CreditState {
     }
     struct CreditNumberProperty {
         string propertyName;
-        uint value;
+        uint256 value;
         bytes1 editable;
     }
-
 }
