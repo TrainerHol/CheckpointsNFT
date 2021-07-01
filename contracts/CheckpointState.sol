@@ -2,33 +2,33 @@
 pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract Credit is Ownable {
-    mapping(uint256 => CreditStringProperty) stringProperties;
+contract CheckpointState is Ownable {
+    mapping(uint256 => CheckpointStringProperty) stringProperties;
     uint256 public stringIndex;
-    mapping(uint256 => CreditNumberProperty) numberProperties;
+    mapping(uint256 => CheckpointNumberProperty) numberProperties;
     uint256 public intIndex;
 
-    mapping(uint256 => CreditProposal) proposals;
-    mapping(uint256 => CreditFields) createdCredits;
+    mapping(uint256 => CheckpointProposal) proposals;
+    mapping(uint256 => CheckpointFields) createdCheckpoints;
 
     enum FlowState {
         OPEN,
         ACCEPTED,
         DENIED
     }
-    struct CreditFields {
+    struct CheckpointFields {
         mapping(uint256 => string) stringProperties;
         mapping(uint256 => uint256) numberProperties;
     }
-    struct CreditProposal {
+    struct CheckpointProposal {
         FlowState flowState;
-        CreditFields credit;
+        CheckpointFields checkpoint;
     }
-    struct CreditStringProperty {
+    struct CheckpointStringProperty {
         string propertyName;
         bool editable;
     }
-    struct CreditNumberProperty {
+    struct CheckpointNumberProperty {
         string propertyName;
         bool editable;
     }

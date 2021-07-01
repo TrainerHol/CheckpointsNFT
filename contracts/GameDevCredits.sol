@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
-import "./CreditState.sol";
+import "./CheckpointState.sol";
 
 interface SURF {
     function balanceOf(address) external view returns (uint256);
@@ -20,12 +20,12 @@ interface SURF {
     ) external returns (bool);
 }
 
-contract GameDevCredits is
+contract Checkpoint is
     ERC721,
     ERC721Enumerable,
     ERC721URIStorage,
     AccessControl,
-    Credit
+    CheckpointState
 {
     using Counters for Counters.Counter;
 
@@ -47,10 +47,10 @@ contract GameDevCredits is
         );
         require(_tokenIdCounter.current() < maxSupply, "Max supply reached");
         _safeMint(to, _tokenIdCounter.current());
-        CreditFields storage credits = createdCredits[
+        CheckpointFields storage checkpoints = createdCheckpoints[
             _tokenIdCounter.current()
         ];
-        credits = proposals[proposalId].credit;
+        checkpoints = proposals[proposalId].checkpoint;
         _tokenIdCounter.increment();
     }
 
@@ -88,39 +88,42 @@ contract GameDevCredits is
     }
 
     modifier onlyTokenOwner(uint256 _tokenId) {
-        require(ownerOf(_tokenId) == msg.sender, "");
+        require(
+            ownerOf(_tokenId) == msg.sender,
+            "Only the token owner can do this"
+        );
         _;
     }
 
-    function CreateCredit(
+    function CreateCheckpoint(
         uint256[] memory numberValues,
         string[] memory stringValues
     ) public onlyOwner {}
 
-    function EditCreditString(
-        uint256 _creditId,
+    function EditCheckpointString(
+        uint256 _checkpointId,
         uint256 _propertyIndex,
         string memory _propertyValue
-    ) public onlyTokenOwner(_creditId) {
+    ) public onlyTokenOwner(_checkpointId) {
         require(
             stringProperties[_propertyIndex].editable,
             "Property not editable"
         );
-        createdCredits[_creditId].stringProperties[
+        createdCheckpoints[_checkpointId].stringProperties[
             _propertyIndex
         ] = _propertyValue;
     }
 
-    function EditCreditNumber(
-        uint256 _creditId,
+    function EditCheckpointNumber(
+        uint256 _checkpointId,
         uint256 _propertyIndex,
         uint256 _propertyValue
-    ) public onlyTokenOwner(_creditId) {
+    ) public onlyTokenOwner(_checkpointId) {
         require(
             numberProperties[_propertyIndex].editable,
             "Property not editable"
         );
-        createdCredits[_creditId].numberProperties[
+        createdCheckpoints[_checkpointId].numberProperties[
             _propertyIndex
         ] = _propertyValue;
     }
@@ -129,7 +132,7 @@ contract GameDevCredits is
         public
         onlyOwner
     {
-        numberProperties[intIndex] = CreditNumberProperty(_name, _editable);
+        numberProperties[intIndex] = CheckpointNumberProperty(_name, _editable);
         intIndex++;
     }
 
@@ -137,7 +140,10 @@ contract GameDevCredits is
         public
         onlyOwner
     {
-        stringProperties[stringIndex] = CreditStringProperty(_name, _editable);
+        stringProperties[stringIndex] = CheckpointStringProperty(
+            _name,
+            _editable
+        );
         stringIndex++;
     }
 }
