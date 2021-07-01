@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
-import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract CheckpointState is Ownable {
+contract CheckpointState {
     mapping(uint256 => CheckpointStringProperty) stringProperties;
     uint256 public stringIndex;
     mapping(uint256 => CheckpointNumberProperty) numberProperties;
