@@ -17,18 +17,24 @@ contract Checkpoint is
 {
     using Counters for Counters.Counter;
 
-    bytes32 public constant MINTER_ROLE = keccak256("GAME_DEV");
-    uint256 maxSupply;
+    bytes32 public constant GAME_DEV = keccak256("GAME_DEV");
+    uint256 public maxSupply;
     Counters.Counter private _tokenIdCounter;
+    bool isLocked;
 
-    constructor(uint256 _maxSupply) ERC721("Checkpoints", "CHECKPOINTS") {
+    constructor(
+        uint256 _maxSupply,
+        address gameOwner,
+        string memory _checkpointName,
+        string memory _checkpointSymbol
+    ) ERC721(_checkpointName, _checkpointSymbol) {
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        _setupRole(MINTER_ROLE, msg.sender);
+        _setupRole(GAME_DEV, msg.sender);
+        _setupRole(GAME_DEV, gameOwner);
         maxSupply = _maxSupply;
     }
 
-    function safeMint(address to, uint256 proposalId) public {
-        require(hasRole(MINTER_ROLE, msg.sender));
+    function safeMint(address to, uint256 proposalId) public onlyGameDev {
         require(
             proposals[proposalId].flowState == FlowState.ACCEPTED,
             "Proposal has not been accepted"
@@ -63,7 +69,45 @@ contract Checkpoint is
         override(ERC721, ERC721URIStorage)
         returns (string memory)
     {
-        return super.tokenURI(tokenId);
+        string memory metadata = "{\n";
+        CheckpointFields storage fields = createdCheckpoints[tokenId];
+        // Loop through string fields
+        for (uint256 index = 0; index < stringIndex; index++) {
+            metadata = string(abi.encodePacked(metadata, '"'));
+            metadata = string(
+                abi.encodePacked(metadata, stringProperties[index].propertyName)
+            );
+            metadata = string(abi.encodePacked(metadata, '": '));
+            metadata = string(abi.encodePacked(metadata, '"'));
+            metadata = string(
+                abi.encodePacked(metadata, fields.stringProperties[index])
+            );
+            metadata = string(abi.encodePacked(metadata, '"'));
+            if (index != stringIndex - 1) {
+                metadata = string(abi.encodePacked(metadata, ",\n"));
+            }
+        }
+        if (stringIndex > 0 && intIndex > 0) {
+            metadata = string(abi.encodePacked(metadata, ",\n"));
+        }
+        // Loop through numerical fields
+        for (uint256 index = 0; index < intIndex; index++) {
+            metadata = string(abi.encodePacked(metadata, '"'));
+            metadata = string(
+                abi.encodePacked(metadata, numberProperties[index].propertyName)
+            );
+            metadata = string(abi.encodePacked(metadata, '": '));
+            metadata = string(abi.encodePacked(metadata, '"'));
+            metadata = string(
+                abi.encodePacked(metadata, fields.numberProperties[index])
+            );
+            metadata = string(abi.encodePacked(metadata, '"'));
+            if (index != intIndex - 1) {
+                metadata = string(abi.encodePacked(metadata, ",\n"));
+            }
+        }
+        metadata = string(abi.encodePacked(metadata, "\n}"));
+        return metadata;
     }
 
     function supportsInterface(bytes4 interfaceId)
@@ -75,18 +119,15 @@ contract Checkpoint is
         return super.supportsInterface(interfaceId);
     }
 
-    modifier onlyTokenOwner(uint256 _tokenId) {
-        require(
-            ownerOf(_tokenId) == msg.sender,
-            "Only the token owner can do this"
-        );
-        _;
+    function LockStructure() public onlyGameDev {
+        require(!isLocked, "Already locked");
+        isLocked = true;
     }
 
     function CreateCheckpoint(
         uint256[] memory numberValues,
         string[] memory stringValues
-    ) public onlyOwner {}
+    ) public {}
 
     function EditCheckpointString(
         uint256 _checkpointId,
@@ -118,7 +159,8 @@ contract Checkpoint is
 
     function AddNumberProperty(string memory _name, bool _editable)
         public
-        onlyOwner
+        onlyGameDev
+        onlyWhenUnlocked
     {
         numberProperties[intIndex] = CheckpointNumberProperty(_name, _editable);
         intIndex++;
@@ -126,12 +168,31 @@ contract Checkpoint is
 
     function AddStringProperty(string memory _name, bool _editable)
         public
-        onlyOwner
+        onlyGameDev
+        onlyWhenUnlocked
     {
         stringProperties[stringIndex] = CheckpointStringProperty(
             _name,
             _editable
         );
         stringIndex++;
+    }
+
+    modifier onlyTokenOwner(uint256 _tokenId) {
+        require(
+            ownerOf(_tokenId) == msg.sender,
+            "Only the token owner can do this"
+        );
+        _;
+    }
+
+    modifier onlyGameDev() {
+        require(hasRole(GAME_DEV, msg.sender), "Game dev role required");
+        _;
+    }
+
+    modifier onlyWhenUnlocked() {
+        require(!isLocked, "Structure is locked");
+        _;
     }
 }
