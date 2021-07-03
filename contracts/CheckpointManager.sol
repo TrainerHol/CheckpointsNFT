@@ -32,6 +32,11 @@ contract CheckpointManager is Ownable {
         string gameName,
         uint256 indexed gameID
     );
+    event CheckpointCreation(
+        uint256 indexed gameID,
+        string name,
+        uint256 maxSupply
+    );
 
     constructor(
         uint256 _minimumSURF,
@@ -63,6 +68,7 @@ contract CheckpointManager is Ownable {
         gameCheckpoints[gameId].push(
             new Checkpoint(maxSupply, msg.sender, _name, _symbol)
         );
+        emit CheckpointCreation(gameId, _name, maxSupply);
     }
 
     modifier onlyGameOwner(uint256 gameId) {
