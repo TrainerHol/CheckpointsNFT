@@ -34,7 +34,17 @@ contract Checkpoint is
         maxSupply = _maxSupply;
     }
 
-    function safeMint(address to, uint256 proposalId) public onlyGameDev {
+    function AcceptProposal(uint256 proposalId) public onlyGameDev {
+        require(proposals[proposalId].flowState == FlowState.OPEN);
+        proposals[proposalId].flowState = FlowState.ACCEPTED;
+    }
+
+    function DenyProposal(uint256 proposalId) public onlyGameDev {
+        require(proposals[proposalId].flowState == FlowState.OPEN);
+        proposals[proposalId].flowState = FlowState.DENIED;
+    }
+
+    function safeMint(address to, uint256 proposalId) public payable {
         require(
             proposals[proposalId].flowState == FlowState.ACCEPTED,
             "Proposal has not been accepted"
