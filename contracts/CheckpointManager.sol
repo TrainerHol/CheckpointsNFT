@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "./Checkpoint.sol";
 
@@ -16,7 +15,7 @@ interface SURF {
     ) external returns (bool);
 }
 
-contract CheckpointManager is Ownable {
+contract CheckpointManager {
     using Counters for Counters.Counter;
 
     SURF surf;
