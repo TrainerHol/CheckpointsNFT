@@ -22,7 +22,6 @@ contract CheckpointManager {
     mapping(uint256 => address) public gameOwners;
     mapping(uint256 => Checkpoint[]) public gameCheckpoints;
     mapping(uint256 => string) public gameNames;
-    address payable whirlpool;
     uint256 minimumSURF;
     Counters.Counter private _gameIdCounter;
 
@@ -38,12 +37,7 @@ contract CheckpointManager {
         uint256 maxSupply
     );
 
-    constructor(
-        uint256 _minimumSURF,
-        address payable _whirlpool,
-        address _surf
-    ) {
-        whirlpool = _whirlpool;
+    constructor(uint256 _minimumSURF, address _surf) {
         minimumSURF = _minimumSURF;
         surf = SURF(_surf);
     }
