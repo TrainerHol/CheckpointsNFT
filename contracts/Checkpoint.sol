@@ -24,9 +24,10 @@ contract Checkpoint is
     bool public isLocked;
     address payable gameOwner;
 
-    event proposalCreation(address creator, uint256 indexed proposalId);
+    event proposalCreation(address indexed creator, uint256 indexed proposalId);
     event proposalApproval(uint256 indexed proposalId);
     event proposalDenial(uint256 indexed proposalId);
+    event proposalMinted(uint256 indexed proposalId, uint256 payment);
 
     constructor(
         uint256 _maxSupply,
@@ -69,6 +70,12 @@ contract Checkpoint is
         checkpoints = proposals[proposalId].checkpoint;
         proposals[proposalId].flowState = FlowState.MINTED;
         _tokenIdCounter.increment();
+        emit proposalMinted(proposalId, msg.value);
+    }
+
+    function WithdrawPayments() public onlyGameDev {
+        require(address(this).balance > 0, "Nothing to withdraw");
+        gameOwner.transfer(address(this).balance);
     }
 
     function _beforeTokenTransfer(

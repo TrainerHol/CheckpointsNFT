@@ -28,12 +28,13 @@ contract CheckpointManager is Ownable {
     Counters.Counter private _gameIdCounter;
 
     event GameRegistration(
-        address gameOwner,
+        address indexed gameOwner,
         string gameName,
         uint256 indexed gameID
     );
     event CheckpointCreation(
         uint256 indexed gameID,
+        address indexed checkpointAddress,
         string name,
         uint256 maxSupply
     );
@@ -69,7 +70,13 @@ contract CheckpointManager is Ownable {
         gameCheckpoints[gameId].push(
             new Checkpoint(maxSupply, msg.sender, mintingPrice, _name, _symbol)
         );
-        emit CheckpointCreation(gameId, _name, maxSupply);
+        uint256 lastIndex = gameCheckpoints[gameId].length - 1;
+        emit CheckpointCreation(
+            gameId,
+            address(gameCheckpoints[gameId][lastIndex]),
+            _name,
+            maxSupply
+        );
     }
 
     modifier onlyGameOwner(uint256 gameId) {
