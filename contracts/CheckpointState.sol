@@ -15,7 +15,8 @@ contract CheckpointState {
     enum FlowState {
         OPEN,
         ACCEPTED,
-        DENIED
+        DENIED,
+        MINTED
     }
     struct CheckpointFields {
         mapping(uint256 => string) stringProperties;

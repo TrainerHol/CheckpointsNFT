@@ -21,6 +21,9 @@ contract Checkpoint is
     uint256 public maxSupply;
     Counters.Counter private _tokenIdCounter;
     bool isLocked;
+    event proposalCreation(address creator, uint256 indexed proposalId);
+    event proposalApproval(uint256 indexed proposalId);
+    event proposalDenial(uint256 indexed proposalId);
 
     constructor(
         uint256 _maxSupply,
@@ -37,11 +40,13 @@ contract Checkpoint is
     function AcceptProposal(uint256 proposalId) public onlyGameDev {
         require(proposals[proposalId].flowState == FlowState.OPEN);
         proposals[proposalId].flowState = FlowState.ACCEPTED;
+        emit proposalApproval(proposalId);
     }
 
     function DenyProposal(uint256 proposalId) public onlyGameDev {
         require(proposals[proposalId].flowState == FlowState.OPEN);
         proposals[proposalId].flowState = FlowState.DENIED;
+        emit proposalDenial(proposalId);
     }
 
     function safeMint(address to, uint256 proposalId) public payable {
@@ -56,6 +61,7 @@ contract Checkpoint is
         ];
         checkpoints = proposals[proposalId].checkpoint;
         _tokenIdCounter.increment();
+        proposals[proposalId].flowState = FlowState.MINTED;
     }
 
     function _beforeTokenTransfer(
@@ -134,11 +140,6 @@ contract Checkpoint is
         isLocked = true;
     }
 
-    function CreateCheckpoint(
-        uint256[] memory numberValues,
-        string[] memory stringValues
-    ) public {}
-
     function CreateProposal(
         uint256[] memory numberValues,
         string[] memory stringValues
@@ -162,6 +163,7 @@ contract Checkpoint is
         for (uint256 index = 0; index < stringValues.length; index++) {
             strProperties[index] = stringValues[index];
         }
+        emit proposalCreation(msg.sender, propIndex);
         propIndex++;
     }
 
