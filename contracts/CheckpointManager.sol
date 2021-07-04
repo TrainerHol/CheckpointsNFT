@@ -62,11 +62,12 @@ contract CheckpointManager is Ownable {
     function CreateCheckpoint(
         uint256 gameId,
         uint256 maxSupply,
+        uint256 mintingPrice,
         string memory _name,
         string memory _symbol
     ) public onlyGameOwner(gameId) {
         gameCheckpoints[gameId].push(
-            new Checkpoint(maxSupply, msg.sender, _name, _symbol)
+            new Checkpoint(maxSupply, msg.sender, mintingPrice, _name, _symbol)
         );
         emit CheckpointCreation(gameId, _name, maxSupply);
     }

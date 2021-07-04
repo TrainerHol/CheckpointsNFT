@@ -19,20 +19,26 @@ contract Checkpoint is
 
     bytes32 public constant GAME_DEV = keccak256("GAME_DEV");
     uint256 public maxSupply;
+    uint256 public mintingPrice;
     Counters.Counter private _tokenIdCounter;
-    bool isLocked;
+    bool public isLocked;
+    address payable gameOwner;
+
     event proposalCreation(address creator, uint256 indexed proposalId);
     event proposalApproval(uint256 indexed proposalId);
     event proposalDenial(uint256 indexed proposalId);
 
     constructor(
         uint256 _maxSupply,
-        address gameOwner,
+        address _gameOwner,
+        uint256 _mintingPrice,
         string memory _checkpointName,
         string memory _checkpointSymbol
     ) ERC721(_checkpointName, _checkpointSymbol) {
         _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _setupRole(GAME_DEV, msg.sender);
+        gameOwner = payable(_gameOwner);
+        mintingPrice = _mintingPrice;
         _setupRole(GAME_DEV, gameOwner);
         maxSupply = _maxSupply;
     }
@@ -50,6 +56,7 @@ contract Checkpoint is
     }
 
     function safeMint(address to, uint256 proposalId) public payable {
+        require(msg.value >= mintingPrice, "Minting price not met");
         require(
             proposals[proposalId].flowState == FlowState.ACCEPTED,
             "Proposal has not been accepted"
@@ -60,8 +67,8 @@ contract Checkpoint is
             _tokenIdCounter.current()
         ];
         checkpoints = proposals[proposalId].checkpoint;
-        _tokenIdCounter.increment();
         proposals[proposalId].flowState = FlowState.MINTED;
+        _tokenIdCounter.increment();
     }
 
     function _beforeTokenTransfer(
