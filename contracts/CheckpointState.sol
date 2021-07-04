@@ -8,7 +8,9 @@ contract CheckpointState {
     uint256 public intIndex;
 
     mapping(uint256 => CheckpointProposal) proposals;
+    uint256 propIndex;
     mapping(uint256 => CheckpointFields) createdCheckpoints;
+    uint256 createdIndex;
 
     enum FlowState {
         OPEN,

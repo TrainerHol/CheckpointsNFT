@@ -129,6 +129,32 @@ contract Checkpoint is
         string[] memory stringValues
     ) public {}
 
+    function CreateProposal(
+        uint256[] memory numberValues,
+        string[] memory stringValues
+    ) public onlyWhenLocked {
+        require(
+            numberValues.length == intIndex &&
+                stringValues.length == stringIndex,
+            "Incorrect structure"
+        );
+        CheckpointProposal storage prop = proposals[propIndex];
+        prop.flowState = FlowState.OPEN;
+        mapping(uint256 => uint256) storage numProperties = prop
+        .checkpoint
+        .numberProperties;
+        for (uint256 index = 0; index < numberValues.length; index++) {
+            numProperties[index] = numberValues[index];
+        }
+        mapping(uint256 => string) storage strProperties = prop
+        .checkpoint
+        .stringProperties;
+        for (uint256 index = 0; index < stringValues.length; index++) {
+            strProperties[index] = stringValues[index];
+        }
+        propIndex++;
+    }
+
     function EditCheckpointString(
         uint256 _checkpointId,
         uint256 _propertyIndex,
@@ -193,6 +219,11 @@ contract Checkpoint is
 
     modifier onlyWhenUnlocked() {
         require(!isLocked, "Structure is locked");
+        _;
+    }
+
+    modifier onlyWhenLocked() {
+        require(isLocked, "Structure must be locked first");
         _;
     }
 }
