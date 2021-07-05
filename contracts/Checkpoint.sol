@@ -68,7 +68,17 @@ contract Checkpoint is
         CheckpointFields storage checkpoints = createdCheckpoints[
             _tokenIdCounter.current()
         ];
-        checkpoints = proposals[proposalId].checkpoint;
+        for (uint256 index = 0; index < intIndex; index++) {
+            checkpoints.numberProperties[index] = proposals[proposalId]
+            .checkpoint
+            .numberProperties[index];
+        }
+        for (uint256 index = 0; index < stringIndex; index++) {
+            checkpoints.stringProperties[index] = getStringValue(
+                proposalId,
+                index
+            );
+        }
         proposals[proposalId].flowState = FlowState.MINTED;
         _tokenIdCounter.increment();
         emit proposalMinted(proposalId, msg.value);
@@ -111,7 +121,10 @@ contract Checkpoint is
             metadata = string(abi.encodePacked(metadata, '": '));
             metadata = string(abi.encodePacked(metadata, '"'));
             metadata = string(
-                abi.encodePacked(metadata, fields.stringProperties[index])
+                abi.encodePacked(
+                    metadata,
+                    string(fields.stringProperties[index])
+                )
             );
             metadata = string(abi.encodePacked(metadata, '"'));
             if (index != stringIndex - 1) {

@@ -18,23 +18,20 @@ contract CheckpointState {
         MINTED
     }
 
-    function getProposalData(uint256 proposalId)
+    function getStringValue(uint256 _propId, uint256 _strIndex)
         public
         view
-        returns (
-            FlowState state,
-            string[] memory strings,
-            uint256[] memory integers
-        )
+        returns (string memory)
     {
-        CheckpointProposal storage prop = proposals[proposalId];
-        state = prop.flowState;
-        for (uint256 index = 0; index < stringIndex; index++) {
-            strings[index] = prop.checkpoint.stringProperties[index];
-        }
-        for (uint256 index = 0; index < stringIndex; index++) {
-            integers[index] = prop.checkpoint.numberProperties[index];
-        }
+        return proposals[_propId].checkpoint.stringProperties[_strIndex];
+    }
+
+    function getNumericalValue(uint256 _propId, uint256 _index)
+        public
+        view
+        returns (uint256)
+    {
+        return proposals[_propId].checkpoint.numberProperties[_index];
     }
 
     struct CheckpointFields {
