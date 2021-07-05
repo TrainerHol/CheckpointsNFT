@@ -14,8 +14,9 @@ async function main() {
   // await hre.run('compile');
 
   // We get the contract to deploy
-  const CheckpointManager = await hre.ethers.getContractFactory("CheckpointManager");
-  const checkpointManager = await CheckpointManager.deploy(0, "0x");
+  const CheckpointManager = await hre.ethers.getContractFactory("CheckpointManager.sol");
+  //Replace with SURF address
+  const checkpointManager = await CheckpointManager.deploy(0, 0x0);
 
   await checkpointManager.deployed();
 
