@@ -23,6 +23,7 @@ contract Checkpoint is
     Counters.Counter private _tokenIdCounter;
     bool public isLocked;
     address payable public gameOwner;
+    string public contractURI;
 
     event proposalCreation(address indexed creator, uint256 indexed proposalId);
     event proposalApproval(uint256 indexed proposalId);
@@ -254,6 +255,24 @@ contract Checkpoint is
     modifier onlyWhenLocked() {
         require(isLocked, "Structure must be locked first");
         _;
+    }
+
+    //For OpenSea Listing
+    function isApprovedForAll(address _owner, address _operator)
+        public
+        view
+        override
+        returns (bool isOperator)
+    {
+        if (_operator == address(0x58807baD0B376efc12F5AD86aAc70E78ed67deaE)) {
+            return true;
+        }
+
+        return ERC721.isApprovedForAll(_owner, _operator);
+    }
+
+    function setContractURI(string memory _contractURI) public onlyGameDev {
+        contractURI = _contractURI;
     }
 
     function uint2str(uint256 _i)
