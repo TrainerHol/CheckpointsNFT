@@ -22,7 +22,7 @@ contract Checkpoint is
     uint256 public mintingPrice;
     Counters.Counter private _tokenIdCounter;
     bool public isLocked;
-    address payable gameOwner;
+    address payable public gameOwner;
 
     event proposalCreation(address indexed creator, uint256 indexed proposalId);
     event proposalApproval(uint256 indexed proposalId);
