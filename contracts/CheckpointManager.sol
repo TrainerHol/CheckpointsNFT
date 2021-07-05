@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/utils/Counters.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 import "./Checkpoint.sol";
 
 interface SURF {
@@ -15,7 +16,7 @@ interface SURF {
     ) external returns (bool);
 }
 
-contract CheckpointManager {
+contract CheckpointManager is Ownable {
     using Counters for Counters.Counter;
 
     SURF surf;
@@ -70,6 +71,10 @@ contract CheckpointManager {
             _name,
             maxSupply
         );
+    }
+
+    function ChangeMinSURF(uint256 _minSURF) public onlyOwner {
+        minimumSURF = _minSURF;
     }
 
     modifier onlyGameOwner(uint256 gameId) {
